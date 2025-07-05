@@ -1,8 +1,8 @@
 import "reflect-metadata";
 import { AppDataSource } from "./database/data-source";
 import app from "./app";
+import { port } from "./secret";
 
-const port = 3000;
 
 AppDataSource.initialize()
   .then(() => {

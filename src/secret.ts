@@ -9,3 +9,4 @@ export const vnpayTmnCode = process.env.vnpayTmnCode
 export const vnpayHost = process.env.vnpayHost
 export const vnpayAddress = process.env.vnpayAddress
 export const emailApiKey = process.env.emailApiKey
+export const port = process.env.port
