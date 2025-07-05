@@ -33,7 +33,8 @@
       "vnpay": "^2.4.0"
    },
    "scripts": {
-      "dev": "nodemon",
-      "typeorm": "typeorm-ts-node-commonjs"
-   }
+    "dev": "node --max-old-space-size=1024 node_modules/.bin/ts-node-dev --respawn src/index.ts",
+    "build": "node --max-old-space-size=1024 node_modules/.bin/tsc",
+    "postinstall": "node --max-old-space-size=1024 node_modules/.bin/prisma generate --schema=src/models/prisma/schema.prisma"
+  }
 }
