@@ -191,9 +191,9 @@ export const getInvoicePdf = async (req: Request, res: Response) => {
     const pdf = await generateInvoicePDF(invoice);
     res.set({
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename=invoice-${invoice.id}.pdf`,
+      "Content-Disposition": `inline; filename=invoice-${invoice.id}.pdf`,
     });
-    res.status(200).json(pdf);
+    res.send(pdf)
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json(error.message);
