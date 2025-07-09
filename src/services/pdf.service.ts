@@ -1,8 +1,11 @@
 import puppeteer from 'puppeteer';
 import { Invoice } from '../entity/Invoice';
+import { buffer } from 'stream/consumers';
 
 
 export const renderInvoiceHtml = (invoice: Invoice) => {
+
+
   const itemsHtml = invoice.items.map((item) => `
     <tr>
       <td>${item.name}</td>
@@ -41,6 +44,8 @@ export const renderInvoiceHtml = (invoice: Invoice) => {
 }
 
 export const generateInvoicePDF = async (invoice: Invoice) => {
+
+
   const html = renderInvoiceHtml(invoice);
 
   const browser = await puppeteer.launch({
@@ -52,8 +57,9 @@ export const generateInvoicePDF = async (invoice: Invoice) => {
 
   const pdfBuffer = await page.pdf({
     format: 'A4',
-   
   });
+
+
 
   await browser.close();
   return pdfBuffer;

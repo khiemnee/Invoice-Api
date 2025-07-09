@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import './services/redis.service'
 import { AppDataSource } from "./database/data-source";
 import app from "./app";
 import { port } from "./secret";

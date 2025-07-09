@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../database/data-source";
 import { Invoice } from "../entity/Invoice";
 import { convertItems, totalAmount } from "../helpers/invoice.helper";
-import { sendEmail } from "../services/email.service";
+import { sendEmailInvoiceJob } from "../jobs/email.job";
+import { viewInvoicePdfQueue } from "../jobs/pdf.job";
 import { generateInvoicePDF } from "../services/pdf.service";
 
 const invoiceRepositoty = AppDataSource.getRepository(Invoice);
@@ -30,7 +31,7 @@ export const getInvoices = async (req: Request, res: Response) => {
       relations: ["client", "user"],
     });
 
-    res.json({
+    res.send({
       data: invoices,
       total,
       page: Number(page),
@@ -39,7 +40,7 @@ export const getInvoices = async (req: Request, res: Response) => {
     });
   } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json(error.message);
+      res.status(500).send(error.message);
     }
   }
 };
@@ -63,12 +64,12 @@ export const createInvoices = async (req: Request, res: Response) => {
 
     await invoiceRepositoty.save(invoices);
 
-    await sendEmail(invoices);
+    await sendEmailInvoiceJob(invoices);
 
-    res.status(201).json(invoices);
+    res.status(201).send(invoices);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json(error.message);
+      res.status(500).send(error.message);
     }
   }
 };
@@ -85,16 +86,16 @@ export const getInvoice = async (req: Request, res: Response) => {
     });
 
     if (!invoice) {
-      res.status(404).json({
+      res.status(404).send({
         error: "Invoice not found !!!",
       });
       return;
     }
 
-    res.status(200).json(invoice);
+    res.status(200).send(invoice);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json(error.message);
+      res.status(500).send(error.message);
     }
   }
 };
@@ -120,7 +121,7 @@ export const updateInvoice = async (req: Request, res: Response) => {
     });
 
     if (!invoice) {
-      res.status(404).json({
+      res.status(404).send({
         error: "invoice not found !!!",
       });
       return;
@@ -140,10 +141,10 @@ export const updateInvoice = async (req: Request, res: Response) => {
     Object.assign(invoice, req.body);
     await invoiceRepositoty.save(invoice);
 
-    res.status(200).json(invoice);
+    res.status(200).send(invoice);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json(error.message);
+      res.status(500).send(error.message);
     }
   }
 };
@@ -157,15 +158,15 @@ export const deleteInvoice = async (req: Request, res: Response) => {
     });
 
     if (!invoice) {
-      res.status(500).json({
+      res.status(500).send({
         error: "Something wrong, please try later !!!",
       });
       return;
     }
-    res.status(200).json(invoice);
+    res.status(200).send(invoice);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json(error.message);
+      res.status(500).send(error.message);
     }
   }
 };
@@ -181,22 +182,27 @@ export const getInvoicePdf = async (req: Request, res: Response) => {
       relations: ["items", "client"],
     });
 
+
     if (!invoice) {
-      res.status(404).json({
+      res.status(404).send({
         error: "Invoice not found !!!",
       });
       return;
     }
 
     const pdf = await generateInvoicePDF(invoice);
+
+    console.log(pdf)
+
     res.set({
       "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename=invoice-${invoice.id}.pdf`,
+      "Content-Disposition": `attachment; filename=invoice-${invoice.id}.pdf`,
     });
-    res.send(pdf)
+    
+  res.status(200).send(pdf);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json(error.message);
+      res.status(500).send(error.message);
     }
   }
 };

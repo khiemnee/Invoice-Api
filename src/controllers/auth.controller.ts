@@ -8,6 +8,7 @@ import {
   refeshAccessToken,
 } from "../helpers/generateToken.helper";
 import { validator } from "../helpers/validator.helper";
+import { refeshTokenKey } from "../secret";
 
 
 const userRepository = AppDataSource.getRepository(User);
@@ -116,19 +117,18 @@ export const refeshToken = async (req: Request, res: Response) => {
   try {
     const refeshTokenCookie = req.cookies.cookieToken;
 
-    console.log(refeshTokenCookie)
 
     if (!refeshTokenCookie) {
       res.status(401).json({ message: "No refresh token provided" });
       return;
     }
 
-    const payload = jwt.verify(refeshTokenCookie, "refeshTokenKeyInvoice") as {
+    const payload = jwt.verify(refeshTokenCookie, refeshTokenKey) as {
       id: number;
     };
 
     const token = await accessToken(payload.id);
-    res.status(200).json({ accessToken: token });
+    res.status(200).send({accessToken : token});
   } catch (error) {
     if (error instanceof Error) {
       res.status(403).json(error.message);
