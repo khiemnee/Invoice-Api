@@ -27,16 +27,16 @@ export const registerUser = async (req: Request, res: Response) => {
     const validatorResult = await validator(newUser)
 
     if(validatorResult !== null){
-      res.status(400).json(validatorResult)
+      res.status(400).send(validatorResult)
       return
     }
 
     await userRepository.save(newUser);
 
-    res.status(201).json(newUser);
+    res.status(201).send(newUser);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(404).json(error.message);
+      res.status(404).send(error.message);
     }
   }
 };
@@ -51,7 +51,7 @@ export const loginUser = async (req: Request, res: Response) => {
     });
 
     if (!userExist) {
-      res.status(404).json({
+      res.status(404).send({
         error: "user not exist !!!",
       });
       return;
@@ -63,7 +63,7 @@ export const loginUser = async (req: Request, res: Response) => {
     );
 
     if (!comparePassword) {
-      res.status(404).json({
+      res.status(404).send({
         error: "Something wrong, please try again!!!",
       });
       return;
@@ -79,10 +79,10 @@ export const loginUser = async (req: Request, res: Response) => {
       maxAge: 604800000,
     });
 
-    res.status(200).json({ userExist, token });
+    res.status(200).send({ userExist, token });
   } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json(error.message);
+      res.status(500).send(error.message);
     }
   }
 };
@@ -90,10 +90,10 @@ export const loginUser = async (req: Request, res: Response) => {
 export const getMe = async (req: Request, res: Response) => {
   try {
     const user = req.user;
-    res.status(200).json(user);
+    res.status(200).send(user);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json(error.message);
+      res.status(500).send(error.message);
     }
   }
 };
@@ -105,10 +105,10 @@ export const logOut = async (req: Request, res: Response) => {
       sameSite: true,
       secure: true,
     });
-    res.status(200).json("logOut sucessfull!!!");
+    res.status(200).send("logOut sucessfull!!!");
   } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json(error.message);
+      res.status(500).send(error.message);
     }
   }
 };
@@ -119,7 +119,7 @@ export const refeshToken = async (req: Request, res: Response) => {
 
 
     if (!refeshTokenCookie) {
-      res.status(401).json({ message: "No refresh token provided" });
+      res.status(401).send({ message: "No refresh token provided" });
       return;
     }
 
@@ -131,7 +131,7 @@ export const refeshToken = async (req: Request, res: Response) => {
     res.status(200).send({accessToken : token});
   } catch (error) {
     if (error instanceof Error) {
-      res.status(403).json(error.message);
+      res.status(403).send(error.message);
     }
   }
 };

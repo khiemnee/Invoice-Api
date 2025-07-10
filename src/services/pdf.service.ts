@@ -1,6 +1,5 @@
 import puppeteer from 'puppeteer';
 import { Invoice } from '../entity/Invoice';
-import { buffer } from 'stream/consumers';
 
 
 export const renderInvoiceHtml = (invoice: Invoice) => {

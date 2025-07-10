@@ -4,9 +4,10 @@ import { Invoice } from "../entity/Invoice";
 import { convertItems, totalAmount } from "../helpers/invoice.helper";
 import { sendEmailInvoiceJob } from "../jobs/email.job";
 import { viewInvoicePdfQueue } from "../jobs/pdf.job";
-import { generateInvoicePDF } from "../services/pdf.service";
+import { Client } from "../entity/Client";
 
 const invoiceRepositoty = AppDataSource.getRepository(Invoice);
+const clientRepository = AppDataSource.getRepository(Client);
 
 export const getInvoices = async (req: Request, res: Response) => {
   try {
@@ -20,7 +21,7 @@ export const getInvoices = async (req: Request, res: Response) => {
     const order: any = {};
     if (sort) {
       const [field, direction] = (sort as string).split(":");
-      order[field] = direction.toUpperCase(); 
+      order[field] = direction.toUpperCase();
     }
 
     const [invoices, total] = await invoiceRepositoty.findAndCount({
@@ -54,7 +55,7 @@ export const createInvoices = async (req: Request, res: Response) => {
     const totalAmountItems = totalAmount(items);
     const convertedItems = await convertItems(items);
 
-    const invoices = invoiceRepositoty.create({
+    const invoice = invoiceRepositoty.create({
       client: { id },
       user: { id: req.user.id },
       dueDate: date,
@@ -62,11 +63,15 @@ export const createInvoices = async (req: Request, res: Response) => {
       items: convertedItems,
     });
 
-    await invoiceRepositoty.save(invoices);
+    await invoiceRepositoty.save(invoice);
 
-    await sendEmailInvoiceJob(invoices);
+    const client = await clientRepository.findOneBy({
+      id: invoice.client.id,
+    });
 
-    res.status(201).send(invoices);
+    await sendEmailInvoiceJob(invoice,client);
+
+    res.status(201).send(invoice);
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).send(error.message);
@@ -182,7 +187,6 @@ export const getInvoicePdf = async (req: Request, res: Response) => {
       relations: ["items", "client"],
     });
 
-
     if (!invoice) {
       res.status(404).send({
         error: "Invoice not found !!!",
@@ -190,16 +194,14 @@ export const getInvoicePdf = async (req: Request, res: Response) => {
       return;
     }
 
-    const pdf = await generateInvoicePDF(invoice);
-
-    console.log(pdf)
+    const pdf = await viewInvoicePdfQueue(invoice);
 
     res.set({
       "Content-Type": "application/pdf",
       "Content-Disposition": `attachment; filename=invoice-${invoice.id}.pdf`,
     });
-    
-  res.status(200).send(pdf);
+
+    res.status(200).send(pdf);
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).send(error.message);

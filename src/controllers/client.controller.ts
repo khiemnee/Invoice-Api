@@ -9,16 +9,16 @@ export const getClients = async (req: Request, res: Response) => {
     const clients = await clientRepository.find();
 
     if (!clients) {
-      res.status(404).json({
+      res.status(404).send({
         error: "Clients not found!!!",
       });
       return;
     }
 
-    res.status(200).json(clients);
+    res.status(200).send(clients);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json(error.message);
+      res.status(500).send(error.message);
     }
   }
 };
@@ -34,15 +34,15 @@ export const getClient = async (req: Request, res: Response) => {
     });
 
     if (!client) {
-      res.status(404).json({
+      res.status(404).send({
         error: "Client not found !!!",
       });
       return;
     }
-    res.status(200).json(client);
+    res.status(200).send(client);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json(error.message);
+      res.status(500).send(error.message);
     }
   }
 };
@@ -53,7 +53,7 @@ export const createClients = async (req: Request, res: Response) => {
     const client = clientRepository.create(data);
 
     if (!client) {
-      res.status(404).json({
+      res.status(404).send({
         error: "Something wrong, please try again !!!",
       });
       return;
@@ -61,10 +61,10 @@ export const createClients = async (req: Request, res: Response) => {
 
     await clientRepository.save(data);
 
-    res.status(201).json(client);
+    res.status(201).send(client);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json(error.message);
+      res.status(500).send(error.message);
     }
   }
 };
@@ -81,7 +81,7 @@ export const updateClient = async (req: Request, res: Response) => {
     const isMatch = updates.every((values) => allowedUpdates.includes(values));
 
     if (!isMatch) {
-      res.status(404).json({
+      res.status(404).send({
         error: "Invalid field to update",
       });
       return;
@@ -92,7 +92,7 @@ export const updateClient = async (req: Request, res: Response) => {
     });
 
     if (!client) {
-      res.status(404).json({
+      res.status(404).send({
         error: "client not found !!!",
       });
       return;
@@ -101,10 +101,10 @@ export const updateClient = async (req: Request, res: Response) => {
     Object.assign(client,data)
 
     await clientRepository.save(client)
-   res.status(200).json(client)
+   res.status(200).send(client)
   } catch (error) {
     if(error instanceof Error){
-        res.status(500).json(error.message)
+        res.status(500).send(error.message)
     }
   }
 };
@@ -119,17 +119,17 @@ export const deleteClient = async(req:Request,res:Response) =>{
         })
 
         if(!client){
-            res.status(404).json({
+            res.status(404).send({
                 error : 'Client not found !!!'
             })
             return
         }
 
         await clientRepository.delete(client.id)
-        res.status(200).json('deleted successfull !!!')
+        res.status(200).send('deleted successfull !!!')
     } catch (error) {
         if(error instanceof Error){
-            res.status(500).json(error.message)
+            res.status(500).send(error.message)
         }
     }
 }

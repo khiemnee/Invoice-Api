@@ -1,19 +1,13 @@
 import * as sgMail from "@sendgrid/mail";
 import { Invoice } from "../entity/Invoice";
-import { AppDataSource } from "../database/data-source";
 import { Client } from "../entity/Client";
 import { emailApiKey } from "../secret";
 
-const clientRepository = AppDataSource.getRepository(Client);
+export const sendEmail = async (invoice: Invoice, client: Client) => {
 
-export const sendEmail = async (invoice: Invoice) => {
-  const client = await clientRepository.findOneBy({
-    id: invoice.client.id,
-  });
 
-  sgMail.setApiKey(
-    emailApiKey
-  );
+
+  sgMail.setApiKey(emailApiKey);
 
   const itemsHtml = invoice.items
     .map(
