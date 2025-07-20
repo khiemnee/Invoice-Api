@@ -1,4 +1,3 @@
-// src/workers/email.worker.ts
 import { Worker } from "bullmq";
 import { sendEmail } from "../services/email.service";
 import connection from "../services/redis.service";

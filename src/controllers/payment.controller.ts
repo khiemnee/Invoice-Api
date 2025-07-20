@@ -10,7 +10,6 @@ import {
   vnpaySecureSecret,
   vnpayTmnCode,
 } from "../secret";
-import connection from "../services/redis.service";
 
 const vnpay = new VNPay({
   tmnCode: vnpayTmnCode,
@@ -88,7 +87,7 @@ export const invoicePaymentStatus = async (req: Request, res: Response) => {
     return;
   } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json(error.message);
+      res.status(500).send(error.message);
     }
   }
 };

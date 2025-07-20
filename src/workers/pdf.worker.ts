@@ -3,8 +3,6 @@ import { generateInvoicePDF } from "../services/pdf.service";
 import connection from "../services/redis.service";
 
 
-
-
 const worker = new Worker(
   "pdf-queue",
   async (job) => {
