@@ -195,7 +195,6 @@ export const getInvoicePdf = async (req: Request, res: Response) => {
     }
 
     const pdf = await viewInvoicePdfQueue(invoice);
-
     res.set({
       "Content-Type": "application/pdf",
       "Content-Disposition": `attachment; filename=invoice-${invoice.id}.pdf`,
